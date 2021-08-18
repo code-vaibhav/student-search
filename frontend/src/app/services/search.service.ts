@@ -43,7 +43,34 @@ export class SearchService {
     const escape = (s: string) => {
       return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
     };
+    
+    function perm(xs) {
+      let ret = [];
 
+      for (let i = 0; i < xs.length; i = i + 1) {
+        let rest = perm(xs.slice(0, i).concat(xs.slice(i + 1)));
+
+        if(!rest.length) {
+          ret.push([xs[i]])
+        } else {
+          for(let j = 0; j < rest.length; j = j + 1) {
+            ret.push([xs[i]].concat(rest[j]))
+          }
+        }
+      }
+      return ret;
+    }
+
+    function matchName(termregex) {
+      nArr = perm(elem.n.split(' '))
+      for(i=0; i<nArr.length; i++) {
+        name = nArr[i].join(' ')
+        if (termregex.test(name.replace(/\s+/g, ' ')))
+          return true
+      }
+
+      return false
+    }
 
     const filter = (elem: Student): Boolean => {
 
@@ -92,7 +119,7 @@ export class SearchService {
 
       if (!(term === null || term === '')) {
         const termregex = new RegExp(escape(term).replace(/\s+/g, ' '), 'i');
-        return (termregex.test(elem.i) || termregex.test(elem.u) || termregex.test(elem.n.replace(/\s+/g, ' ')));
+        return (termregex.test(elem.i) || termregex.test(elem.u) || matchName(termregex));
       }
 
       return true;
